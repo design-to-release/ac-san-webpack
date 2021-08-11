@@ -1,6 +1,8 @@
 import type { Compiler, WebpackPluginInstance } from 'webpack';
 
-export default class implements WebpackPluginInstance {
+class ACSanPlugin implements WebpackPluginInstance {
   apply(compiler: Compiler) {
   }
 }
+
+export = ACSanPlugin;
