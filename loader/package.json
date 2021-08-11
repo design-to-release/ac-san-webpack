@@ -1,0 +1,9 @@
+{
+  "main": "lib.cjs",
+  "dependencies": {
+    "hyntax": "^1.1.9",
+    "loader-utils": "^2.0.0",
+    "magic-string": "^0.25.7",
+    "ts-morph": "^11.0.3"
+  }
+}
