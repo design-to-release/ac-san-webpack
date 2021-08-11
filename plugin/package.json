@@ -1,3 +1,8 @@
 {
-  "main": "lib.cjs"
+  "main": "./dist/lib.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "swc lib.ts -d dist",
+    "install": "npm run build"
+  }
 }

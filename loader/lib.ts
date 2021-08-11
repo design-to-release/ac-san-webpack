@@ -3,7 +3,7 @@ const { tokenize, constructTree } = require('hyntax');
 const { Project, SyntaxKind } = require('ts-morph');
 const { getOptions } = require('loader-utils');
 
-module.exports = async function(source) {
+export default async function(source) {
   const magicContent = new MagicString(source);
   const { tokens } = tokenize(source);
   const { ast } = constructTree(tokens);
@@ -72,7 +72,7 @@ module.exports = async function(source) {
       basePos + 1,
       `\r\nimport { ac as __θac } from './atomic-class.js';
       ${
-        Array(usedIndex).fill().map((_, i) => `
+        Array(usedIndex).fill(0).map((_, i) => `
         const __ac${i}Trigger = function (ev) {
           __θac(${JSON.stringify(sheetRegistries[i])}, function (vm, s) {
             vm.data.set('__θac0', s);
@@ -95,14 +95,14 @@ module.exports = async function(source) {
     magicContent.appendRight(startPos, 'Object.assign(');
     magicContent.appendRight(
       endPos,
-      `, { ${Array(usedIndex).fill().map((_, i) => `__θac${i}: ''`).join(',')} });`,
+      `, { ${Array(usedIndex).fill(0).map((_, i) => `__θac${i}: ''`).join(',')} });`,
     );
 
     // Inject event handlers
     magicContent.appendRight(
       basePos + exportAssignment.getStart() + 18,
       `${
-        Array(usedIndex).fill().map((_, i) => `
+        Array(usedIndex).fill(0).map((_, i) => `
         __ac${i}Trigger,
       `).join('')
       }`,

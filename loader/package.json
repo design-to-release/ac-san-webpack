@@ -1,5 +1,9 @@
 {
-  "main": "lib.cjs",
+  "main": "./dist/lib.js",
+  "scripts": {
+    "build": "swc lib.ts -d dist",
+    "install": "npm run build"
+  },
   "dependencies": {
     "hyntax": "^1.1.9",
     "loader-utils": "^2.0.0",
