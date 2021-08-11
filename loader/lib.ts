@@ -116,4 +116,4 @@ export default async function(source) {
   }
 
   return source;
-};
+}
