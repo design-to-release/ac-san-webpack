@@ -7,9 +7,11 @@
     "fmt": "dprint fmt",
     "fmt:check": "dprint check"
   },
-  "devDependencies": {
+  "dependencies": {
     "@swc/cli": "^0.1.46",
-    "@swc/core": "^1.2.76",
+    "@swc/core": "^1.2.76"
+  },
+  "devDependencies": {
     "@types/webpack": "^5.28.0",
     "dprint": "^0.15.4"
   }
