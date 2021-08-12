@@ -8,6 +8,8 @@
 
 ### Installation
 
+_**TODO: Finally need to be published on npm**_
+
 ```
 npm i design-to-release/ac-san-webpack#main
 ```

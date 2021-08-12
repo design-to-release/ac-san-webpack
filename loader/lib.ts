@@ -3,7 +3,16 @@ const { tokenize, constructTree } = require('hyntax');
 const { Project, SyntaxKind } = require('ts-morph');
 const { getOptions } = require('loader-utils');
 
-export default async function(source) {
+const NS = 'ac-san-webpack';
+
+export default async function(source: string) {
+  // console.log(this);
+  const loaderContext = this;
+  // if (!loaderContext[NS]) {
+  //   loaderContext[NS] = { usedACClass: new Set<string>() };
+  // }
+  // console.log(loaderContext);
+  
   const magicContent = new MagicString(source);
   const { tokens } = tokenize(source);
   const { ast } = constructTree(tokens);
@@ -27,6 +36,14 @@ export default async function(source) {
       let classAttrNode = undefined;
       for (const attr of curr.attributes) {
         if (attr.key.content.startsWith('ac-')) {
+          const usedClasses = attr.value.content.split(' ').filter(i => {
+            if (i) {
+              // loaderContext[NS].usedACClass.add(i);
+              return true;
+            }
+
+            return false;
+          });
           needInject = true;
           magicContent.overwrite(
             attr.key.startPosition,
@@ -37,8 +54,7 @@ export default async function(source) {
           if (!sheetRegistries[usedIndex]) {
             sheetRegistries[usedIndex] = {};
           }
-          sheetRegistries[usedIndex][attr.key.content.slice(3)] = attr.value
-            .content.split(' ').filter((i) => i);
+          sheetRegistries[usedIndex][attr.key.content.slice(3)] = usedClasses;
         } else if (attr.key.content === 'class') {
           classAttrNode = attr;
         }

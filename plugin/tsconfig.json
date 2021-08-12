@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es2019",
+    "module": "commonjs",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationDir": "dist",
+    "suppressImplicitAnyIndexErrors": true,
+    "lib": [
+      "ES2019.Array",
+      "ES2020.Promise",
+      "ES2015"
+    ]
+  },
+  "include": ["src"]
+}

@@ -2,7 +2,20 @@
   "main": "./dist/lib.js",
   "type": "commonjs",
   "scripts": {
-    "build": "swc lib.ts -d dist",
-    "install": "npm run build"
+    "install": "run-s rls",
+    "build": "swc src -d dist",
+    "build:watch": "run-s \"build -- --watch\"",
+    "types": "tsc",
+    "types:watch": "run-s \"types -- --watch\"",
+    "dev": "run-p build:watch types:watch",
+    "rls": "run-p build types"
+  },
+  "dependencies": {
+    "css-tree": "^1.1.3",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/css-tree": "^1.0.6",
+    "@types/node-fetch": "^2.5.12"
   }
 }
