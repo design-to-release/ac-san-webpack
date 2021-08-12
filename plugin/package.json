@@ -11,8 +11,8 @@
     "rls": "run-p build types"
   },
   "dependencies": {
-    "css-tree": "^1.1.3",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "postcss": "^8.3.6"
   },
   "devDependencies": {
     "@types/css-tree": "^1.0.6",

@@ -6,12 +6,7 @@ const { getOptions } = require('loader-utils');
 const NS = 'ac-san-webpack';
 
 export default async function(source: string) {
-  // console.log(this);
   const loaderContext = this;
-  // if (!loaderContext[NS]) {
-  //   loaderContext[NS] = { usedACClass: new Set<string>() };
-  // }
-  // console.log(loaderContext);
   
   const magicContent = new MagicString(source);
   const { tokens } = tokenize(source);
@@ -38,7 +33,7 @@ export default async function(source: string) {
         if (attr.key.content.startsWith('ac-')) {
           const usedClasses = attr.value.content.split(' ').filter(i => {
             if (i) {
-              // loaderContext[NS].usedACClass.add(i);
+              loaderContext[NS].adoptedClasses.add(i);
               return true;
             }
 

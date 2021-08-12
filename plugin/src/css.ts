@@ -2,7 +2,6 @@ import { join, isAbsolute } from 'path';
 import { URL } from 'url';
 import { readFile } from 'fs/promises';
 import fetch from 'node-fetch';
-import { parse, walk, generate } from 'css-tree';
 
 const NewLine = '\r\n';
 
@@ -26,14 +25,6 @@ export async function merge(parent: string, paths: string[]): Promise<string> {
     tasks.push(loadStyleSheet(i));
   }
   return (await Promise.all(tasks)).join(NewLine);
-
-  // const ast = parse(source);
-  // walk(ast, node => {
-  //   console.log(node);
-  // });
-
-  // const code = generate(ast);
-  // console.log(code);
 }
 
 async function loadStyleSheet(path: Path): Promise<string> {

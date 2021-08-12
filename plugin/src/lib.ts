@@ -1,7 +1,8 @@
-import type { Compiler, WebpackPluginInstance, NormalModule } from 'webpack';
+import type { Compiler, WebpackPluginInstance } from 'webpack';
 import type { PluginConfig } from './config';
 import type { PartialOrRequired, RL } from './utility-types';
 
+import { parse } from 'postcss';
 import { resolve as resolveConfig } from './config';
 import { merge as mergeStyleSheets } from './css';
 
@@ -21,20 +22,34 @@ class Plugin implements WebpackPluginInstance {
   }
 
   apply(compiler: Compiler) {
-    console.log(compiler);
-    // await mergeStyleSheets(compiler.context, this.cssCfg.paths);
     const normalModule = compiler.webpack.NormalModule;
-    // const adoptedClasses = new Set<string>();
+    const adoptedClasses = new Set<string>();
 
-    // compiler.hooks.compilation.tap(ID, compilation => {
-    //   const normalModuleLoader = normalModule.getCompilationHooks(compilation).loader;
-    //   console.log(normalModuleLoader);
-    //   // normalModuleLoader.tap(ID, async loaderContext => {
-    //     // console.log("qweqeqweqweqwe")
-    //     // loaderContext[NS] = true;
-    //   // });
-    // });
-    compiler.hooks.
+    compiler.hooks.compilation.tap(ID, compilation => {
+      const normalModuleLoader = normalModule.getCompilationHooks(compilation).loader;
+      normalModuleLoader.tap(ID, async loaderContext => {
+        loaderContext[NS] = { adoptedClasses };
+      });
+    });
+
+    compiler.hooks.emit.tap(ID, async compilation => {
+      const source = await mergeStyleSheets(compiler.context, this.cssCfg.paths);
+      const ast = parse(source);
+
+      ast.walkRules(rule => {
+        if (rule.selector[0] === '.' && !adoptedClasses.has(rule.selector.slice(1))) {
+          rule.remove();
+        }
+      });
+
+      const html = compilation.getAsset('index.html');
+      html.source._value = `<head>
+      <style>
+${ast.toString()}
+      </style>
+      
+      <script defer src=\"main.js\"></script></head><body>\n  <div id=\"app\"></div>\n</body>`
+    });
   }
 }
 
