@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.default = _default;
-var _magicString = _interopRequireDefault(require("magic-string"));
 var _hyntax = require("hyntax");
+var _magicString = _interopRequireDefault(require("magic-string"));
 var _tsMorph = require("ts-morph");
 var _plugin = require("./plugin");
 function _interopRequireDefault(obj) {

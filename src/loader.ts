@@ -1,8 +1,8 @@
-import type { LoaderContext } from 'webpack';
 import type { TreeConstructor } from 'hyntax';
+import type { LoaderContext } from 'webpack';
 
+import { constructTree, tokenize } from 'hyntax';
 import MagicString from 'magic-string';
-import { tokenize, constructTree } from 'hyntax';
 import { Project, SyntaxKind } from 'ts-morph';
 import { PluginSymbol } from './plugin';
 
@@ -17,7 +17,9 @@ export default async function(this: LoaderContext<{ dbg: boolean }>, contents: s
   const tpl = ast.content.children.find(
     ({ nodeType, content }) => nodeType === 'tag' && (content as TreeConstructor.NodeContents.Tag).name === 'template',
   ) as TreeConstructor.TagNode | undefined;
-  const script = ast.content.children.find(({ nodeType }) => nodeType === 'script') as TreeConstructor.ScriptNode | undefined;
+  const script = ast.content.children.find(({ nodeType }) => nodeType === 'script') as
+    | TreeConstructor.ScriptNode
+    | undefined;
 
   if (!tpl) {
     return contents;
