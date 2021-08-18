@@ -1,39 +1,45 @@
-const MagicString = require('magic-string');
-const { tokenize, constructTree } = require('hyntax');
-const { Project, SyntaxKind } = require('ts-morph');
-const { getOptions } = require('loader-utils');
+import type { LoaderContext } from 'webpack';
+import type { TreeConstructor } from 'hyntax';
 
-const NS = 'ac-san-webpack';
+import MagicString from 'magic-string';
+import { tokenize, constructTree } from 'hyntax';
+import { Project, SyntaxKind } from 'ts-morph';
+import { PluginSymbol } from './plugin';
 
-export default async function(source: string) {
+export default async function(this: LoaderContext<{ dbg: boolean }>, contents: string) {
   const loaderContext = this;
-  
-  const magicContent = new MagicString(source);
-  const { tokens } = tokenize(source);
+  const options = loaderContext.getOptions();
+
+  const magicContent = new MagicString(contents);
+  const { tokens } = tokenize(contents);
   const { ast } = constructTree(tokens);
 
   const tpl = ast.content.children.find(
-    ({ nodeType, content }) => nodeType === 'tag' && content.name === 'template',
-  );
-  const script = ast.content.children.find(({ nodeType }) => nodeType === 'script');
+    ({ nodeType, content }) => nodeType === 'tag' && (content as TreeConstructor.NodeContents.Tag).name === 'template',
+  ) as TreeConstructor.TagNode | undefined;
+  const script = ast.content.children.find(({ nodeType }) => nodeType === 'script') as TreeConstructor.ScriptNode | undefined;
+
+  if (!tpl) {
+    return contents;
+  }
 
   let stack = [tpl];
   let usedIndex = 0;
-  const sheetRegistries = [];
+  const sheetRegistries: Array<Record<string, string[] | undefined>> = [];
   for (let curr = tpl.content, i = 0; i < stack.length; ++i) {
     curr = stack[i].content;
     if (curr.children) {
-      stack.push(...curr.children.filter((i) => i.nodeType === 'tag'));
+      stack.push(...curr.children.filter((i) => i.nodeType === 'tag') as TreeConstructor.TagNode[]);
     }
 
     if (curr.attributes) {
       let needInject = false;
       let classAttrNode = undefined;
       for (const attr of curr.attributes) {
-        if (attr.key.content.startsWith('ac-')) {
-          const usedClasses = attr.value.content.split(' ').filter(i => {
+        if (attr.key?.content.startsWith('ac-')) {
+          const usedClasses = attr.value?.content.split(' ').filter(i => {
             if (i) {
-              loaderContext[NS].adoptedClasses.add(i);
+              loaderContext[PluginSymbol].adoptedClasses.add(i);
               return true;
             }
 
@@ -42,7 +48,7 @@ export default async function(source: string) {
           needInject = true;
           magicContent.overwrite(
             attr.key.startPosition,
-            attr.endWrapper.endPosition + 1,
+            (attr.endWrapper?.endPosition ?? attr.key.startPosition) + 1,
             '',
           );
 
@@ -50,18 +56,18 @@ export default async function(source: string) {
             sheetRegistries[usedIndex] = {};
           }
           sheetRegistries[usedIndex][attr.key.content.slice(3)] = usedClasses;
-        } else if (attr.key.content === 'class') {
+        } else if (attr.key?.content === 'class') {
           classAttrNode = attr;
         }
       }
       if (needInject) {
         let startPos = curr.openStart.endPosition;
         let endPos = -1;
-        const cls = `class="${classAttrNode?.value.content
+        const cls = `class="${classAttrNode?.value?.content
           ?? ''} {{ __θac${usedIndex} }}"`;
         if (classAttrNode) {
-          startPos = classAttrNode.key.startPosition;
-          endPos = classAttrNode.endWrapper.endPosition;
+          startPos = classAttrNode.key?.startPosition ?? 0;
+          endPos = classAttrNode.endWrapper?.endPosition ?? 0;
         }
         const event = `on-actrigger="__ac${usedIndex}Trigger"`;
 
@@ -99,10 +105,10 @@ export default async function(source: string) {
       script.content.value.content,
     );
     const exportAssignment = sourceFile.getExportAssignment((i) => !i.isExportEquals());
-    const returnStmt = exportAssignment.getDescendantStatements().find((i) => i.asKind(SyntaxKind.ReturnStatement));
+    const returnStmt = exportAssignment?.getDescendantStatements().find((i) => i.asKind(SyntaxKind.ReturnStatement));
 
-    let startPos = basePos + returnStmt.getStart() + 8;
-    let endPos = basePos + returnStmt.getEnd() + 1;
+    let startPos = basePos + (returnStmt?.getStart() ?? 0) + 8;
+    let endPos = basePos + (returnStmt?.getEnd() ?? startPos) + 1;
     magicContent.appendRight(startPos, 'Object.assign(');
     magicContent.appendRight(
       endPos,
@@ -111,7 +117,7 @@ export default async function(source: string) {
 
     // Inject event handlers
     magicContent.appendRight(
-      basePos + exportAssignment.getStart() + 18,
+      basePos + (exportAssignment?.getStart() ?? 0) + 18,
       `${
         Array(usedIndex).fill(0).map((_, i) => `
         __ac${i}Trigger,
@@ -120,11 +126,11 @@ export default async function(source: string) {
     );
   }
 
-  source = magicContent.toString();
+  contents = magicContent.toString();
 
-  if (getOptions(this).dbg) {
-    console.log(source);
+  if (options.dbg) {
+    console.log(contents);
   }
 
-  return source;
+  return contents;
 }

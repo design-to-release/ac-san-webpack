@@ -6,11 +6,10 @@ import { parse } from 'postcss';
 import { resolve as resolveConfig } from './config';
 import { merge as mergeStyleSheets } from './css';
 
-const ID = 'ac-san-webpack-plugin';
-const NS = 'ac-san-webpack';
+const PluginName = 'ac-san-webpack-plugin';
+export const PluginSymbol = Symbol(PluginName);
 
-class Plugin implements WebpackPluginInstance {
-
+export default class implements WebpackPluginInstance {
   #cfg: Required<PartialOrRequired<PluginConfig, RL>>;
 
   get cssCfg() {
@@ -25,16 +24,14 @@ class Plugin implements WebpackPluginInstance {
     const normalModule = compiler.webpack.NormalModule;
     const adoptedClasses = new Set<string>();
 
-    compiler.hooks.compilation.tap(ID, compilation => {
+    compiler.hooks.thisCompilation.tap(PluginName, async compilation => {
       const normalModuleLoader = normalModule.getCompilationHooks(compilation).loader;
-      normalModuleLoader.tap(ID, async loaderContext => {
-        loaderContext[NS] = { adoptedClasses };
+      normalModuleLoader.tap(PluginName, loaderContext => {
+        loaderContext[PluginSymbol] = { adoptedClasses };
       });
-    });
 
-    compiler.hooks.emit.tap(ID, async compilation => {
-      const source = await mergeStyleSheets(compiler.context, this.cssCfg.paths);
-      const ast = parse(source);
+      const content = await mergeStyleSheets(compiler.context, this.cssCfg.paths);
+      const ast = parse(content);
 
       ast.walkRules(rule => {
         if (rule.selector[0] === '.' && !adoptedClasses.has(rule.selector.slice(1))) {
@@ -42,15 +39,21 @@ class Plugin implements WebpackPluginInstance {
         }
       });
 
-      const html = compilation.getAsset('index.html');
-      html.source._value = `<head>
-      <style>
-${ast.toString()}
-      </style>
-      
-      <script defer src=\"main.js\"></script></head><body>\n  <div id=\"app\"></div>\n</body>`
+      const { ConcatSource } = compiler.webpack.sources;
+      const source = new ConcatSource(content);
+
+      compilation.hooks.renderManifest.tap(PluginName, (result, { chunk }) => {
+        result.push({
+          render: () => source,
+          filenameTemplate: '[name].css',
+          pathOptions: {
+            chunk,
+          },
+          identifier: `${PluginName}.${chunk.id}`,
+        });
+
+        return result;
+      });
     });
   }
 }
-
-export = Plugin;

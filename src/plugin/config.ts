@@ -2,10 +2,10 @@ import type { PartialOrRequired, RL } from './utility-types';
 
 export function resolve(cfg: PluginConfig): Required<PartialOrRequired<PluginConfig, RL>> {
   const { css = {} } = cfg;
-  
+
   return {
-    css: resolveCSSConfig(css)
-  }
+    css: resolveCSSConfig(css),
+  };
 }
 
 function resolveCSSConfig(cfg: PluginCSSConfig): Required<PluginCSSConfig> {
@@ -13,8 +13,8 @@ function resolveCSSConfig(cfg: PluginCSSConfig): Required<PluginCSSConfig> {
 
   return {
     paths,
-    treeShaking
-  }
+    treeShaking,
+  };
 }
 
 export interface PluginConfig {
@@ -22,13 +22,12 @@ export interface PluginConfig {
 }
 
 export interface PluginCSSConfig {
-
   /**
    * Atomic Class root style sheet paths.
    * Both local paths and remote URL are allowed.
-   * 
+   *
    * ex: ['./global.css', '/path/to/global.css', 'https:\/\/global.css']
-   * 
+   *
    * @default []
    */
   paths?: string[];

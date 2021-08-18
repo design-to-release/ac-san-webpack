@@ -18,5 +18,6 @@
       "ES2015"
     ]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules/"]
 }

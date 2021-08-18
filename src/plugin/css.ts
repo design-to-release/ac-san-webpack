@@ -1,7 +1,7 @@
-import { join, isAbsolute } from 'path';
-import { URL } from 'url';
 import { readFile } from 'fs/promises';
 import fetch from 'node-fetch';
+import { isAbsolute, join } from 'path';
+import { URL } from 'url';
 
 const NewLine = '\r\n';
 
@@ -30,7 +30,7 @@ export async function merge(parent: string, paths: string[]): Promise<string> {
 async function loadStyleSheet(path: Path): Promise<string> {
   if (path.isRemote) {
     const resp = await fetch(path.toString());
-    
+
     return resp.text();
   }
 
@@ -58,5 +58,5 @@ function isRemote(s: string): boolean {
     return false;
   }
 
-  return url.protocol === "http:" || url.protocol === "https:";
+  return url.protocol === 'http:' || url.protocol === 'https:';
 }
