@@ -1,5 +1,5 @@
 {
-  
+  "exclude": [".*.spec.ts$", ".*/testdata/.*"],
   "jsc": {
     "target": "es2019",
     "parser": {
