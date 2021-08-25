@@ -3,8 +3,9 @@ import type { LoaderContext } from 'webpack';
 
 import { constructTree, tokenize } from 'hyntax';
 import MagicString from 'magic-string';
-import { Project, SyntaxKind } from 'ts-morph';
-import { PluginSymbol } from './plugin';
+import { Project } from 'ts-morph';
+import { PluginSymbol } from '../plugin';
+import { expandsReturnStmt, getIninDataReturnStmt } from './ast/script';
 
 export default async function(this: LoaderContext<{ dbg: boolean }>, contents: string) {
   const loaderContext = this;
@@ -106,20 +107,20 @@ export default async function(this: LoaderContext<{ dbg: boolean }>, contents: s
       'temp.ts',
       script.content.value.content,
     );
-    const exportAssignment = sourceFile.getExportAssignment((i) => !i.isExportEquals());
-    const returnStmt = exportAssignment?.getDescendantStatements().find((i) => i.asKind(SyntaxKind.ReturnStatement));
 
-    let startPos = basePos + (returnStmt?.getStart() ?? 0) + 8;
-    let endPos = basePos + (returnStmt?.getEnd() ?? startPos) + 1;
-    magicContent.appendRight(startPos, 'Object.assign(');
-    magicContent.appendRight(
-      endPos,
-      `, { ${Array(usedIndex).fill(0).map((_, i) => `__θac${i}: ''`).join(',')} });`,
+    const exportAssignment = sourceFile.getExportAssignment((i) => !i.isExportEquals())!;
+    const returnStmt = getIninDataReturnStmt(exportAssignment);
+
+    expandsReturnStmt(
+      magicContent,
+      returnStmt,
+      `{ ${Array(usedIndex).fill(0).map((_, i) => `__θac${i}: ''`).join(',')} }`,
+      basePos,
     );
 
     // Inject event handlers
     magicContent.appendRight(
-      basePos + (exportAssignment?.getStart() ?? 0) + 18,
+      basePos + (exportAssignment.getStart() ?? 0) + 18,
       `${
         Array(usedIndex).fill(0).map((_, i) => `
         __ac${i}Trigger,

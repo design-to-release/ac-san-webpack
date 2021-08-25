@@ -12,8 +12,9 @@
     "build:swc": "swc src -d dist",
     "clean": "rimraf dist",
     "dev": "run-s \"build -- --watch\"",
-    "rls": "run-s fmt clean build",
-    "postrls": "git add dist -f"
+    "rls": "run-s fmt test clean build",
+    "postrls": "git add dist -f",
+    "test": "jest"
   },
   "dependencies": {
     "hyntax": "^1.1.9",
@@ -23,15 +24,18 @@
     "ts-morph": "^11.0.3"
   },
   "devDependencies": {
-    "@swc/cli": "^0.1.46",
-    "@swc/core": "^1.2.76",
+    "@swc/cli": "^0.1.49",
+    "@swc/core": "^1.2.82",
     "@types/css-tree": "^1.0.6",
+    "@types/jest": "^27.0.1",
     "@types/node-fetch": "^2.5.12",
     "@types/webpack": "^5.28.0",
     "chokidar": "^3.5.2",
     "dprint": "^0.15.4",
+    "jest": "^27.0.6",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
+    "ts-jest": "^27.0.5",
     "typescript": "^4.3.5"
   }
 }
