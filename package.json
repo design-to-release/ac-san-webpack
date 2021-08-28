@@ -13,7 +13,6 @@
     "clean": "rimraf dist",
     "dev": "run-s \"build -- --watch\"",
     "rls": "run-s fmt test clean build",
-    "postrls": "git add dist -f",
     "test": "jest"
   },
   "dependencies": {
