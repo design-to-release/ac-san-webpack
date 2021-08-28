@@ -15,8 +15,7 @@
   "excludes": [
     "**/node_modules",
     "**/*-lock.json",
-    "**/dist",
-    "**/testdata"
+    "**/dist"
   ],
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.50.2.wasm",

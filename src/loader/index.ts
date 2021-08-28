@@ -7,7 +7,7 @@ import { Project } from 'ts-morph';
 import { PluginSymbol } from '../plugin';
 import { expandsReturnStmt, getIninDataReturnStmt } from './ast/script';
 
-export default async function(this: LoaderContext<{ dbg: boolean }>, contents: string) {
+export default async function(this: LoaderContext<{ dbg: boolean }>, contents: string): Promise<string> {
   const loaderContext = this;
   const options = loaderContext.getOptions();
 
@@ -86,7 +86,7 @@ export default async function(this: LoaderContext<{ dbg: boolean }>, contents: s
   }
 
   if (script) {
-    const basePos = script.content.openEnd.endPosition;
+    const basePos = script.content.value.startPosition;
 
     magicContent.appendRight(
       basePos + 1,
