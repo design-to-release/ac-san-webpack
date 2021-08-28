@@ -90,7 +90,7 @@ export default async function(this: LoaderContext<{ dbg: boolean }>, contents: s
 
     magicContent.appendRight(
       basePos + 1,
-      `\r\nimport { ac as __θac } from './atomic-class.js';
+      `\r\nimport { ac as __θac } from 'atomic-class';
       ${
         Array(usedIndex).fill(0).map((_, i) => `
         const __ac${i}Trigger = function (ev) {
