@@ -16,3 +16,9 @@ jobs:
       - run: npm run fmt:check
       - run: npm run test
       - run: npm run build
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v2
+        with:
+          name: ${{ matrix.os }}-${{ matrix.node }}
+          files: ./coverage/lcov.info

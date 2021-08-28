@@ -3,6 +3,7 @@
 [![tag](https://img.shields.io/github/tag/design-to-release/ac-san-webpack.svg)](https://github.com/design-to-release/ac-san-webpack)
 [![Build Status](https://github.com/design-to-release/ac-san-webpack/workflows/ci/badge.svg?branch=main)](https://github.com/design-to-release/ac-san-webpack/actions)
 [![license](https://img.shields.io/github/license/design-to-release/ac-san-webpack.svg)](https://github.com/design-to-release/ac-san-webpack)
+[![codecov](https://codecov.io/gh/design-to-release/ac-san-webpack/branch/main/graph/badge.svg)](https://codecov.io/gh/design-to-release/ac-san-webpack)
 
 ## Usage
 
